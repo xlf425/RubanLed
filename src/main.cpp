@@ -67,15 +67,56 @@ void loop() {
 CRGB leds[NUM_LEDS];
 CRGB leds2[NUM_LEDS];
 
-int posPlayer1()
+void winner(int player)
 {
-  int x = 0;
-  if (digitalRead(2) == LOW)
-  {
-    Serial.println("boup");
-    x++;
-    return x;
-  }
+if (player = 0){
+  static int state = 0;
+
+    if (state == 0)
+    {
+      for (int i = 0; i < NUM_LEDS - 1; i++)
+      {
+        leds[i] = CRGB::Green;
+        leds2[i] = CRGB::Red;
+      }
+    }
+    else
+    {
+      for (int i = 0; i < NUM_LEDS - 1; i++)
+      {
+        leds[i] = CRGB::Black;
+      }
+    }
+    state = !state;
+
+    FastLED.show();
+    delay(300);
+    FastLED.clear();
+}
+if (player = 1){
+  static int state = 0;
+
+    if (state == 0)
+    {
+      for (int i = 0; i < NUM_LEDS - 1; i++)
+      {
+        leds2[i] = CRGB::Green;
+        leds[i] = CRGB::Red;
+      }
+    }
+    else
+    {
+      for (int i = 0; i < NUM_LEDS - 1; i++)
+      {
+        leds2[i] = CRGB::Black;
+      }
+    }
+    state = !state;
+
+    FastLED.show();
+    delay(300);
+    FastLED.clear();
+}
 }
 
 void setup()
@@ -85,30 +126,57 @@ void setup()
   pinMode(3, INPUT_PULLUP);
   FastLED.addLeds<WS2813, LED_PIN, GRB>(leds, NUM_LEDS);
   FastLED.addLeds<WS2813, LED_PIN2, GRB>(leds2, NUM_LEDS);
-  FastLED.setBrightness(100);
+  FastLED.setBrightness(10);
 }
 
 void loop()
 {
+  static int i = 105;
 
-  static int i = 0;
-  if (digitalRead(2) == LOW)
+  if (i == 119)
   {
-    Serial.print("boup/");
-    i++;
+    
   }
-  Serial.println(i);
-  leds[i] = CRGB::Red;
-  FastLED.show();
-  leds[i] = CRGB::Black;
-  FastLED.show();
-  if ( i == 119){
-    i = 0;
+  else
+  {
+    int currentState = digitalRead(2);
+    static int previousState = HIGH;
+
+    if (currentState == LOW)
+    {
+      if (previousState == HIGH)
+      {
+        i++;
+      }
+    }
+    previousState = currentState;
+    Serial.println(i);
+    leds[i] = CRGB::Red;
+    FastLED.show();
+    leds[i] = CRGB::Black;
+    winner(0);
+    FastLED.show();
+
+
+    /*
+    static int movement = 0;
+    static int brightness = 0;
+    if (movement == 0 && brightness < 254)
+    {
+      brightness++;
+    }
+    else if (movement == 1 && brightness > 0)
+    {
+      brightness--;
+    }
+    else if (brightness > 254 || brightness < 0)
+    {
+      movement = !movement;
+    }
+    delay(50);
+    FastLED.setBrightness(brightness);
+    */
   }
-
-  
-
-  
 
   // leds2[i] = CRGB::DarkCyan;
   // FastLED.delay(33);
