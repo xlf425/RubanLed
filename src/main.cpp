@@ -69,8 +69,11 @@ CRGB leds2[NUM_LEDS];
 
 void winner(int player)
 {
-if (player = 0){
-  static int state = 0;
+  Serial.println(player);
+  if (player == -1){ return; }
+  if (player == 0)
+  {
+    static int state = 0;
 
     if (state == 0)
     {
@@ -85,6 +88,7 @@ if (player = 0){
       for (int i = 0; i < NUM_LEDS - 1; i++)
       {
         leds[i] = CRGB::Black;
+        leds2[i] = CRGB::Black;
       }
     }
     state = !state;
@@ -92,9 +96,10 @@ if (player = 0){
     FastLED.show();
     delay(300);
     FastLED.clear();
-}
-if (player = 1){
-  static int state = 0;
+  }
+  if (player == 1)
+  {
+    static int state = 0;
 
     if (state == 0)
     {
@@ -116,7 +121,55 @@ if (player = 1){
     FastLED.show();
     delay(300);
     FastLED.clear();
+  }
 }
+
+int run()
+{
+
+  static int i = 0;
+  static int j = 0;
+  int currentState = digitalRead(2);
+  int currentState1 = digitalRead(3);
+  static int previousState = HIGH;
+  static int previousState1 = HIGH;
+  int player = -1; 
+
+  if (currentState == LOW)
+  {
+    if (previousState == HIGH)
+    {
+      i++;
+    }
+  }
+  if (currentState1 == LOW)
+  {
+    if (previousState1 == HIGH)
+    {
+      j++;
+    }
+  }
+  previousState = currentState;
+  previousState1 = currentState1;
+  Serial.println(i);
+  leds[i] = CRGB::Purple;
+  leds2[j] = CRGB::DarkBlue;
+  FastLED.show();
+  leds[i] = CRGB::Black;
+  leds2[j] = CRGB::Black;
+  if ((i == 119) || (j == 119))
+  {
+    if (i < j)
+    {
+       player = 1;
+    }
+    else
+    {
+       player = 0;
+    }
+  }
+  Serial.println(player);
+  return player;
 }
 
 void setup()
@@ -126,44 +179,18 @@ void setup()
   pinMode(3, INPUT_PULLUP);
   FastLED.addLeds<WS2813, LED_PIN, GRB>(leds, NUM_LEDS);
   FastLED.addLeds<WS2813, LED_PIN2, GRB>(leds2, NUM_LEDS);
-  FastLED.setBrightness(10);
+  FastLED.setBrightness(100);
 }
 
 void loop()
 {
-  static int i = 105;
-
-  if (i == 119)
+  winner(run());
+  /*
+  static int movement = 0;
+  static int brightness = 0;
+  if (movement == 0 && brightness < 254)
   {
-    
-  }
-  else
-  {
-    int currentState = digitalRead(2);
-    static int previousState = HIGH;
-
-    if (currentState == LOW)
-    {
-      if (previousState == HIGH)
-      {
-        i++;
-      }
-    }
-    previousState = currentState;
-    Serial.println(i);
-    leds[i] = CRGB::Red;
-    FastLED.show();
-    leds[i] = CRGB::Black;
-    winner(0);
-    FastLED.show();
-
-
-    /*
-    static int movement = 0;
-    static int brightness = 0;
-    if (movement == 0 && brightness < 254)
-    {
-      brightness++;
+   brightness++;
     }
     else if (movement == 1 && brightness > 0)
     {
@@ -176,8 +203,6 @@ void loop()
     delay(50);
     FastLED.setBrightness(brightness);
     */
-  }
-
   // leds2[i] = CRGB::DarkCyan;
   // FastLED.delay(33);
   // leds[i] = CRGB::Black;
